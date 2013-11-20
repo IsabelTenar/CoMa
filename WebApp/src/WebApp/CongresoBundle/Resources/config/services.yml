@@ -1,0 +1,7 @@
+parameters:
+#    congreso.example.class: WebApp\CongresoBundle\Example
+
+services:
+#    congreso.example:
+#        class: %congreso.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]
