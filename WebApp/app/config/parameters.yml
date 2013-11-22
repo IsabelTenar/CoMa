@@ -2,7 +2,7 @@ parameters:
     database_driver: pdo_sqlite
     database_host: 127.0.0.1
     database_port: null
-    database_name: ugrcongress
+    database_name: ugr_congress
     database_user: root
     database_password: null
     mailer_transport: smtp
@@ -10,5 +10,5 @@ parameters:
     mailer_user: null
     mailer_password: null
     locale: en
-    secret: 4be27310558810710f4f2dd936ae099e10109
-    database_path: ugr_congress.db
+    secret: 8e6210deb22b598a9804b34e5f5ae6ed6
+    database_path: C:\Apache24\htdocs\WebApp\src\data\ugr_congress.db

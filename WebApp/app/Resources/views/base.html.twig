@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8" />
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>{% block title %}{% endblock %} | UGRCongress</title>
         {% block stylesheets %}{% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
-    <body>
+    <body id="{% block id '' %}"><div id="contenedor">
         {% block body %}{% endblock %}
+            
+            <footer>
+                <a href="{{ path('pagina_estatica',{'pagina':'contacto'}) }}">
+                    Contacto 
+                </a>
+                 |
+                <a href="{{ path('pagina_estatica', { 'pagina': 'sobrenosotros' })}}">
+                     Sobre nosotros
+                </a>
+            </footer>
         {% block javascripts %}{% endblock %}
-    </body>
+    </div></body>
 </html>

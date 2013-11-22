@@ -192,7 +192,7 @@ class Actividad
      * @param string $congreso
      * @return Actividad
      */
-    public function setCongreso($congreso)
+    public function setCongreso(\WebApp\CongresoBundle\Entity\Congreso $congreso)
     {
         $this->congreso = $congreso;
     

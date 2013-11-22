@@ -4,11 +4,14 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Apache24/htdocs/WebApp/src/WebApp/CongresoBundle/Entity/Congreso.php</file>
-            <file>file:/C:/Apache24/htdocs/WebApp/app/config/config.yml</file>
-            <file>file:/C:/Apache24/htdocs/WebApp/app/config/parameters.yml</file>
-            <file>file:/C:/Apache24/htdocs/WebApp/src/WebApp/UsuarioBundle/Entity/Usuario.php</file>
-            <file>file:/C:/Apache24/htdocs/WebApp/src/WebApp/CongresoBundle/Entity/Actividad.php</file>
-            <file>file:/C:/Apache24/htdocs/WebApp/src/WebApp/CongresoBundle/Entity/Noticia.php</file>
+            <file>file:/C:/Apache24/htdocs/WebApp/src/WebApp/CongresoBundle/Entity/CongresoRepository.php</file>
+            <file>file:/C:/Apache24/htdocs/WebApp/src/WebApp/CongresoBundle/Controller/DefaultController.php</file>
+            <file>file:/C:/Apache24/htdocs/WebApp/src/WebApp/CongresoBundle/Resources/css/normalizar.css</file>
+            <file>file:/C:/Apache24/htdocs/WebApp/src/WebApp/CongresoBundle/Resources/views/Default/portada.html.twig</file>
+            <file>file:/C:/Apache24/htdocs/WebApp/app/Resources/views/intermedio.html.twig</file>
+            <file>file:/C:/Apache24/htdocs/WebApp/app/Resources/views/base.html.twig</file>
+            <file>file:/C:/Apache24/htdocs/WebApp/src/WebApp/CongresoBundle/Resources/css/intermedio.css</file>
+            <file>file:/C:/Apache24/htdocs/WebApp/src/WebApp/CongresoBundle/Resources/css/comun.css</file>
         </group>
     </open-files>
 </project-private>

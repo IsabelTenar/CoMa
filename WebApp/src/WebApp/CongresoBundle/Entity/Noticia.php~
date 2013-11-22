@@ -132,7 +132,7 @@ class Noticia
      * @param string $congreso
      * @return Noticia
      */
-    public function setCongreso($congreso)
+    public function setCongreso(\WebApp\CongresoBundle\Entity\Congreso $congreso)
     {
         $this->congreso = $congreso;
     

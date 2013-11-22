@@ -5,10 +5,8 @@ namespace WebApp\CongresoBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Congreso
- *
- * @ORM\Table()
  * @ORM\Entity
+ * @ORM\Entity(repositoryClass="WebApp\CongresoBundle\Entity\CongresoRepository")
  */
 class Congreso
 {
@@ -62,11 +60,22 @@ class Congreso
      * @ORM\Column(name="contacto", type="string", length=255)
      */
     private $contacto;
+    
+        /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="fecha_crea", type="date")
+     */
+    private $fechaCrea;
 
     /** @ORM\ManyToOne(targetEntity="WebApp\UsuarioBundle\Entity\Usuario")
      */
     private $usuario;
 
+    public function __construct()
+    {
+        $this->fechaCrea = new \DateTime();
+    }
 
     /**
      * Get id
@@ -237,5 +246,28 @@ class Congreso
     public function getUsuario()
     {
         return $this->usuario;
+    }
+
+    /**
+     * Set fechaCrea
+     *
+     * @param \DateTime $fechaCrea
+     * @return Congreso
+     */
+    public function setFechaCrea($fechaCrea)
+    {
+        $this->fechaCrea = $fechaCrea;
+    
+        return $this;
+    }
+
+    /**
+     * Get fechaCrea
+     *
+     * @return \DateTime 
+     */
+    public function getFechaCrea()
+    {
+        return $this->fechaCrea;
     }
 }

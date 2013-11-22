@@ -7,8 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Congreso
  *
- * @ORM\Table()
- * @ORM\Entity
+ * @ORM\Table(name = "Congreso")
+ * @ORM\Entity(repositoryClass="WebApp\CongresoBundle\Entity\CongresoRepository")
  */
 class Congreso
 {
@@ -62,11 +62,22 @@ class Congreso
      * @ORM\Column(name="contacto", type="string", length=255)
      */
     private $contacto;
+    
+        /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="fecha_crea", type="date")
+     */
+    private $fechaCrea;
 
     /** @ORM\ManyToOne(targetEntity="WebApp\UsuarioBundle\Entity\Usuario")
      */
     private $usuario;
 
+    public function __construct()
+    {
+        $this->fechaCrea = new \DateTime();
+    }
 
     /**
      * Get id
@@ -222,7 +233,7 @@ class Congreso
      * @param string $usuario
      * @return Congreso
      */
-    public function setUsuario($usuario)
+    public function setUsuario(\WebApp\UsuarioBundle\Entity\Usuario $usuario)
     {
         $this->usuario = $usuario;
     
@@ -237,5 +248,28 @@ class Congreso
     public function getUsuario()
     {
         return $this->usuario;
+    }
+
+    /**
+     * Set fechaCrea
+     *
+     * @param \DateTime $fechaCrea
+     * @return Congreso
+     */
+    public function setFechaCrea($fechaCrea)
+    {
+        $this->fechaCrea = $fechaCrea;
+    
+        return $this;
+    }
+
+    /**
+     * Get fechaCrea
+     *
+     * @return \DateTime 
+     */
+    public function getFechaCrea()
+    {
+        return $this->fechaCrea;
     }
 }
