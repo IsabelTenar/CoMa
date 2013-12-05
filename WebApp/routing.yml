@@ -1,0 +1,16 @@
+#app/config/routing.yml
+congreso:
+    resource: "@CongresoBundle/Resources/config/routing.yml"
+    prefix:   /
+
+usuario:
+    resource: "@UsuarioBundle/Resources/config/routing.yml"
+    prefix:   /
+
+pagina_estatica:
+    path: /sitio/{pagina}/
+    defaults: {_controller: CongresoBundle:Sitio:estatica}
+    
+portada:
+    path: /
+    defaults: {_controller: CongresoBundle:Default:portada}
