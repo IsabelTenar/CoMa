@@ -1,3 +1,0 @@
-congreso_homepage:
-    pattern:  /hello/{name}
-    defaults: { _controller: CongresoBundle:Default:index }
