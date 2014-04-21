@@ -17,24 +17,39 @@
 <script type="text/javascript">
 	//add listener when device ready
 	document.addEventListener("deviceready", onDeviceReady, false);
-	var db = window.openDatabase("Congress", "1.0", "congress",0);
+	var db = window.openDatabase("Congress", "1.0", "congress", 0);
+	var chcon = "Congreso1";
+	var resultado;
 	//function will be called when device ready
 	function onDeviceReady() {
-		 //will create database Dummy_DB or open it
 		db.transaction(populateDB, errorCB, successCB);
+		db.transaction(populate2, errorCB, success2);
 	}
-
+	
+	function p (callback){
+		  db.transaction(function coletandovisitas(tx){
+			  tx.executeSql('SELECT Nombre FROM Congresos1', [], function x(tx, results){
+			    var array_retorno = new Array();
+			    $.each(results.rows, function(index) {
+			    	var row = results.rows.item(index);
+			    	array_retorno[index] = row['Nombre'];
+			    });
+			    callback(array_retorno);
+			  }, function err(){} );            
+			  },function erro(){}, function acerto(){} );
+	}
+	
 	//create table and insert some record
 	function populateDB(tx) {
-		//tx.executeSql('DROP IF EXISTS SoccerPlayer');
-		tx.executeSql('CREATE TABLE IF NOT EXISTS Congresos (Nombre VARCHAR(20) PRIMARY KEY NOT NULL, Fecha_ini DATE, Fecha_ fin DATE)');
-		tx.executeSql('DELETE FROM Congresos');
-		tx.executeSql('INSERT INTO Congresos VALUES ("Congreso1", "2015-08-13", "2015-08-17")');
-		tx.executeSql('INSERT INTO Congresos VALUES ("Congreso2", "2015-08-13", "2015-08-17")');
-		tx.executeSql('INSERT INTO Congresos VALUES ("Congreso3", "2015-08-13", "2015-08-17")');
-		//tx.executeSql('INSERT INTO SoccerPlayer(Name,Club) VALUES ("Van Persie", "Arsenal")');
-		//tx.executeSql('DROP TABLE IF EXIST SoccerPlayer');
-		//tx.executeSql('DELETE FROM Congresos');
+		//tx.executeSql('CREATE TABLE Congresos1 (Nombre VARCHAR(20) PRIMARY KEY NOT NULL, Fecha_ini DATE, Fecha_ fin DATE, Informacion VARCHAR(40), Ciudad VARCHAR(20))');
+		//tx.executeSql('DELETE FROM Congresos1');
+		//tx.executeSql('INSERT INTO Congresos1 VALUES ("Congreso1", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 1", "Granada")');
+		//tx.executeSql('INSERT INTO Congresos1 VALUES ("Congreso2", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 2", "Sevilla")');
+		//tx.executeSql('INSERT INTO Congresos1 VALUES ("Congreso3", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 3", "Cadiz")');
+	}
+	//create table and insert some record
+	function populate2(t2) {
+		
 	}
 
 	//function will be called when an error occurred
@@ -44,27 +59,92 @@
 
 	//function will be called when process succeed
 	function successCB() {
-		//alert("success!");
 		db.transaction(queryDB, errorCB);
 	}
-
-	//select all from SoccerPlayer
-	function queryDB(tx) {
-		tx.executeSql('SELECT * FROM Congresos', [], querySuccess, errorCB);
+	
+	function success2() {
+		db.transaction(query2, errorCB);
 	}
-
+	
+	var chcon = "Congreso1";
+	
+	function query2(t2) {
+		q = "SELECT Informacion, Ciudad FROM Congresos1 WHERE Nombre = \'" + chcon + "\';";
+		t2.executeSql(q, [], querySuccess2, errorCB);
+	}
+	
+	function queryDB(tx) {
+		tx.executeSql('SELECT Nombre, Fecha_ini FROM Congresos1', [], querySuccess, errorCB);
+	}
+	
+	
+	// Rellena el congreso que esta picado.
+	function querySuccess2(t2, result2) {
+		$('#info').empty();
+		$.each(result2.rows, function(index) {
+			var row = result2.rows.item(index);
+			$('#info').append(
+					'<h1>' + row['Informacion'] + '</h1>');
+		});
+		$('#info').listview();
+		
+		$('#city').empty();
+		$.each(result2.rows, function(index) {
+			var row = result2.rows.item(index);
+			$('#city').append(
+					'<h1>' + row['Ciudad'] + '</h1>');
+		});
+		$('#city').listview();
+	}
+	
+	
+	//Query de los congresos en la base de datos, para my congress
 	function querySuccess(tx, result) {
 		$('#CongressList').empty();
 		$.each(result.rows, function(index) {
 			var row = result.rows.item(index);
 			$('#CongressList').append(
-					'<li><a href="#"><h3 class="ui-li-heading">' + row['Nombre']
-							+ '</h3><p class="ui-li-desc">Fecha ' + row['Fecha_ini']
-							+ '</p></a></li>');
+					'<li id = "'+row['Nombre']+'"><a href="#"><h3 class="ui-li-heading">'
+							+ row['Nombre']
+							+ '</h3><p class="ui-li-desc">Fecha '
+							+ row['Fecha_ini'] + '</p></a></li>');
 		});
-
+		
 		$('#CongressList').listview();
 	}
+	
+    $(document).ready(function(){
+		p(function (array_retorno) {
+    		$.each(array_retorno, function(index, value) {
+    			var n  = "\"#" + array_retorno[index] + "\"";
+    			alert(n);
+    			$(n).live('click',function () {
+            		chcon = array_retorno[index];
+            		db.transaction(populate2, errorCB, success2);
+            	});
+    		});
+		});
+            /*$("#Congreso1").live('click',function () {
+            	chcon = "Congreso1";
+            	db.transaction(populate2, errorCB, success2);
+            	//$('#info').reload();
+            	//$('#city').reload();
+            });
+            $("#Congreso2").live('click',function () {
+            	chcon = "Congreso2"; 
+            	db.transaction(populate2, errorCB, success2);
+            	//$('#info').reload();
+            	//$('#city').reload();
+            });
+            $("#Congreso3").live('click',function () {
+            	chcon = "Congreso3";
+            	db.transaction(populate2, errorCB, success2);
+            	//$('#info').reload();
+            	//$('#city').reload();
+            });*/
+            
+            
+    });
 </script>
 
 </head>
@@ -77,33 +157,52 @@
 	</div>
 
 	<!--NAVBAR!!-->
-	<div data-role="tabs" id="tabs">
-		<div data-role="navbar">
-			<ul>
-				<li><a href="#one" data-ajax="false">Info</a></li>
-				<li><a href="#two" data-ajax="false">City</a></li>
-				<li><a href="#three" data-ajax="false">News</a></li>
-			</ul>
+	<div data-role="content">
+		<div data-role="tabs" id="tabs">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#info" data-ajax="false">Info</a></li>
+					<li><a href="#city" data-ajax="false">City</a></li>
+					<li><a href="#news" data-ajax="false">News</a></li>
+				</ul>
+			</div>
+			
+			<!-- DENTRO DE INFO -->
+			<div id="info" class="ui-body-d ui-content">
+			</div>
+			
+			<!-- DENTRO DE CITY -->
+			<div id="city">
+			</div>
+			
+			<!-- DENTRO DE NEWS -->
+			<div id="news">
+				<h1>News about the congress on twitter</h1>
+			</div>
 		</div>
+	</div>
+	
+	<!-- PANEL OPTIONS -->
+	<div data-role="panel" id="panel1" data-display="push"
+		data-position-fixed="true" data-theme="b">
+		<div data-role="content">
+			<ul data-role="listview">
+				<li><a href="#">Language</a></li>
+				<li><a href="#">Download</a></li>
+				<li><a href="#">About</a></li>
 
-		<div id="one" class="ui-body-d ui-content">
-			<h1>Information about the congress</h1>
-		</div>
-		<div id="two">
-			<h1>Information about the city</h1>
-		</div>
-		<div id="three">
-			<h1>News about the congress on twitter</h1>
+			</ul>
 		</div>
 	</div>
 
 	<!--FOOTER-->
 	<div data-role="footer" data-theme="b" data-position="fixed">
-
+		<!-- BOTÓN MY CONGRESS -->
 		<a href="#popupMenu" data-rel="popup"
 			class="ui-btn ui-shadow ui-btn-inline ui-icon-grid 
                ui-btn-icon-left ui-btn-a"
-			style="float: left">My Congress </a>
+			style="float: right">My Congress </a>
+
 		<div data-role="popup" id="popupMenu" data-theme="b">
 			<div data-role="content">
 				<ul id="CongressList">
@@ -111,19 +210,12 @@
 			</div>
 		</div>
 
-
-		<a href="#popupMenu1" data-rel="popup"
+		<!-- BOTON OPTIONS -->
+		<a href="#panel1" data-rel="popup"
 			class="ui-btn ui-shadow ui-btn-inline ui-icon-gear 
                ui-btn-icon-left ui-btn-a"
-			style="float: right">Options</a>
+			style="float: left">Options</a>
 
-		<div data-role="popup" id="popupMenu1" data-theme="b">
-			<ul data-role="listview" data-inset="true">
-				<li><a href="#">Languaje</a></li>
-				<li><a href="#">Download</a></li>
-				<li><a href="#">About</a></li>
-			</ul>
-		</div>
 	</div>
 
 
