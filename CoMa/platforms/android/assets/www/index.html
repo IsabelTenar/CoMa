@@ -117,32 +117,12 @@
 		p(function (array_retorno) {
     		$.each(array_retorno, function(index, value) {
     			var n  = "\"#" + array_retorno[index] + "\"";
-    			alert(n);
     			$(n).live('click',function () {
             		chcon = array_retorno[index];
             		db.transaction(populate2, errorCB, success2);
             	});
     		});
-		});
-            /*$("#Congreso1").live('click',function () {
-            	chcon = "Congreso1";
-            	db.transaction(populate2, errorCB, success2);
-            	//$('#info').reload();
-            	//$('#city').reload();
-            });
-            $("#Congreso2").live('click',function () {
-            	chcon = "Congreso2"; 
-            	db.transaction(populate2, errorCB, success2);
-            	//$('#info').reload();
-            	//$('#city').reload();
-            });
-            $("#Congreso3").live('click',function () {
-            	chcon = "Congreso3";
-            	db.transaction(populate2, errorCB, success2);
-            	//$('#info').reload();
-            	//$('#city').reload();
-            });*/
-            
+		});          
             
     });
 </script>
@@ -177,7 +157,13 @@
 			
 			<!-- DENTRO DE NEWS -->
 			<div id="news">
-				<h1>News about the congress on twitter</h1>
+			
+				<a class="twitter-timeline" href="https://twitter.com/tichatuch" data-widget-id="482081557960617985">Tweets por @tichatuch</a>
+
+				<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id))
+				{js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}
+				(document,"script","twitter-wjs");</script>
+
 			</div>
 		</div>
 	</div>
