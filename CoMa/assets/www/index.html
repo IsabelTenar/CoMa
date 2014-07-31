@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport"
 	content="width=device-width, minimum-scale=1, maximum-scale=1">
-<title>CoMa</title>
-
 <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.1/jquery.mobile-1.4.1.min.css" />
+<!--<script type="text/css" src="js/libs/jquery-mobile-1.0.1/jquery.mobile-1.4.1.min.css"></script>-->
 <script type="text/javascript" src="js/libs/jquery-1.7.1/jquery.min.js"></script>
 <script type="text/javascript" src="js/libs/jquery-mobile-1.0.1/jquery.mobile-1.4.2.min.js"></script>
 <script type="text/javascript" src="js/cordova.js"></script>
@@ -18,88 +17,45 @@
 	var resultado;
 	//function will be called when device ready
 	function onDeviceReady() {
-		//Creamos las tablas Congresos y Actividades y metemos datos de prueba
-		db.transaction(populateCon, errorCB, successCB);
 		
-		//Query de la inicializacion de datos en la app
-		db.transaction(populate2, errorCB, success2);
+		//Creamos las tablas Congresos y Actividades y metemos datos de prueba
+		db.transaction(populateCon, error_default, successCB);
+		
+		//Llenamos las cajas de información con el congreso por defecto :D
+		db.transaction(populate_void, error_default, success_info);
 	}
 	
-	function p (callback){
-		  db.transaction(function coletandovisitas(tx){
-			  tx.executeSql('SELECT Nombre FROM Congresos', [], function x(tx, results){
-			    var array_retorno = new Array();
-			    $.each(results.rows, function(index) {
-			    	var row = results.rows.item(index);
-			    	array_retorno[index] = row['Nombre'];
-			    });
-			    callback(array_retorno);
-			  }, function err(){} );            
-			  },function erro(){}, function acerto(){} );
-	}
-	
-	//create table and insert some record
+	//Crea tablas y mete información de prueba dentro de Congresos y Actividades
 	function populateCon(tx) {
 		tx.executeSql('CREATE TABLE IF NOT EXISTS Congresos (Nombre VARCHAR(20) PRIMARY KEY NOT NULL, Fecha_ini DATE, Fecha_ fin DATE, Informacion VARCHAR(40), Ciudad VARCHAR(20))');
-		//tx.executeSql('INSERT INTO Congresos VALUES ("Congreso1", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 1", "Granada")');
-		//tx.executeSql('INSERT INTO Congresos VALUES ("Congreso2", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 2", "Sevilla")');
-		//tx.executeSql('INSERT INTO Congresos VALUES ("Congreso3", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 3", "Cadiz")');
-		
+		/* tx.executeSql('INSERT INTO Congresos VALUES ("Congreso1", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 1", "Granada")');
+		tx.executeSql('INSERT INTO Congresos VALUES ("Congreso2", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 2", "Sevilla")');
+		tx.executeSql('INSERT INTO Congresos VALUES ("Congreso3", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 3", "Cadiz")');
+		 */
 		tx.executeSql('CREATE TABLE IF NOT EXISTS Actividades (NombreAct VARCHAR(20) PRIMARY KEY NOT NULL, NombreCon VARCHAR(20) NOT NULL, Hora_ini DATETIME, Hora_fin DATETIME, Informacion VARCHAR(40))');
-		//tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Patata","Congreso1","2015-08-13T17:30:00","2015-08-13T20:30:00", "Meeting sobre Patatas, una fuente de alimentacion")');
-
+		/* tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Patata","Congreso1","2015-08-13T17:30:00","2015-08-13T20:30:00", "Meeting sobre Patatas, una fuente de alimentacion")');
+		tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Sandia","Congreso1","2015-08-14T17:30:00","2015-08-14T20:30:00", "Meeting sobre Sandias, una fuente de alimentacion")');
+		tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Peras","Congreso1","2015-08-15T17:30:00","2015-08-15T19:30:00", "Meeting sobre Peras, una fuente de alimentacion")');
+		tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Tomates","Congreso1","2015-08-15T19:30:00","2015-08-15T20:30:00", "Meeting sobre Patatas, una fuente de alimentacion")');
+ 		*/
 	}
 	
-	//create table and insert some record
-	function populate2(t2) {
-		
-	}
-	//function will be called when an error occurred
-	function errorCB(err) {
+	//Función que devuelve error SQL por defecto
+	function error_default(err) {
 		alert("Error processing SQL: " + err.code);
 	}
-	//function will be called when process succeed
+	
+	//Al iniciar la aplicación realiza una query para saber los congresos a elegir dentro de la app
 	function successCB() {
-		db.transaction(queryDB, errorCB);
+		db.transaction(queryDB, error_default);
 	}
 	
-	function success2() {
-		db.transaction(query2, errorCB);
-	}
-	
-	var chcon = "Congreso1";
-	
-	function query2(t2) {
-		q = "SELECT Informacion, Ciudad FROM Congresos WHERE Nombre = \'" + chcon + "\';";
-		t2.executeSql(q, [], querySuccess2, errorCB);
-	}
-	
+	// Realiza la query para saber el nombre y la fecha de inicio de los congresos a seleccionar
 	function queryDB(tx) {
-		tx.executeSql('SELECT Nombre, Fecha_ini FROM Congresos', [], querySuccess, errorCB);
+		tx.executeSql('SELECT Nombre, Fecha_ini FROM Congresos', [], querySuccess, error_default);
 	}
 	
-	
-	// Rellena el congreso que esta picado.
-	function querySuccess2(t2, result2) {
-		$('#info').empty();
-		$.each(result2.rows, function(index) {
-			var row = result2.rows.item(index);
-			$('#info').append(
-					'<h1>' + row['Informacion'] + '</h1>');
-		});
-		$('#info').listview();
-		
-		$('#city').empty();
-		$.each(result2.rows, function(index) {
-			var row = result2.rows.item(index);
-			$('#city').append(
-					'<h1>' + row['Ciudad'] + '</h1>');
-		});
-		$('#city').listview();
-	}
-	
-	
-	//Query de los congresos en la base de datos, para my congress
+	//Genera el html de la lista de congresos entre los que podemos seleccionar
 	function querySuccess(tx, result) {
 		$('#CongressList').empty();
 		$.each(result.rows, function(index) {
@@ -114,13 +70,56 @@
 		$('#CongressList').listview();
 	}
 	
+	//Populate vacio, cuando no tenemos que hacer nada
+	function populate_void(t2) {}
+	
+	//Para generar la información dentro de cada página de la aplicación, con el primer congreso por defecto
+	function success_info() {
+		db.transaction(query_info, error_default);
+	}
+	
+	var chcon = "Congreso1";
+	
+	function query_info(t2) {
+		q = "SELECT Informacion FROM Congresos WHERE Nombre = \'" + chcon + "\';";
+		t2.executeSql(q, [], querysuccess_info, error_default);
+	}
+	
+	// Rellena el congreso que esta picado.
+	function querysuccess_info(t2, result2) {
+		$('#info').empty();
+		$.each(result2.rows, function(index) {
+			var row = result2.rows.item(index);
+			$('#info').append(
+					'<h1>' + row['Informacion'] + '</h1>');
+		});
+		$('#info').listview();
+	}
+	
+	//Con esta función objetemos un array con los nombres de todos los congresos dentro de la aplicacion
+	//Se usa para saber cual es el nombre del congreso seleccionado en cada momento
+	function p (callback){
+		  db.transaction(function coletandovisitas(tx){
+			  tx.executeSql('SELECT Nombre FROM Congresos', [], function x(tx, results){
+			    var array_retorno = new Array();
+			    $.each(results.rows, function(index) {
+			    	var row = results.rows.item(index);
+			    	array_retorno[index] = row['Nombre'];
+			    });
+			    callback(array_retorno);
+			  }, function err(){} );            
+			  },function erro(){}, function acerto(){} );
+	}
+	
+	//Cuando se hace click en un congreso nuevo dentro de "My congress" se 
+	//vuelve a realizar una query en función de este congreso con el que se rellenaran las cajas de info
     $(document).ready(function(){
 		p(function (array_retorno) {
     		$.each(array_retorno, function(index, value) {
     			var n  = "\"#" + array_retorno[index] + "\"";
     			$(n).live('click',function () {
             		chcon = array_retorno[index];
-            		db.transaction(populate2, errorCB, success2);
+            		db.transaction(populate_void, error_default, success_info);
             	});
     		});
 		});          
@@ -139,11 +138,11 @@
 
 	<!--NAVBAR!!-->
 	<div data-role="content">
-		<div data-role="tabs" id="tabs">
+		<div data-role="tabs" id="tabs" data-position="fixed">
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#info" data-ajax="false">Info</a></li>
-					<li><a href="#city" data-ajax="false">City</a></li>
+					<li><a href="#timetable" data-ajax="false">Actividades</a></li>
 					<li><a href="#news" data-ajax="false">News</a></li>
 				</ul>
 			</div>
@@ -152,8 +151,8 @@
 			<div id="info" class="ui-body-d ui-content">
 			</div>
 			
-			<!-- DENTRO DE CITY -->
-			<div id="city">
+			<!-- DENTRO DE TIMETABLE -->
+			<div id="timetable">
 			</div>
 			
 			<!-- DENTRO DE NEWS -->

@@ -20,6 +20,8 @@
 package com.coolappz.CoMa;
 
 import android.os.Bundle;
+import android.view.WindowManager;
+
 import org.apache.cordova.*;
 
 public class CoMa extends CordovaActivity 
@@ -30,9 +32,12 @@ public class CoMa extends CordovaActivity
         super.onCreate(savedInstanceState);
         super.init();
         // Set by <content src="index.html" /> in config.xml
-        //super.loadUrl(Config.getStartUrl());
+        
+        //Para que le de tiempo a cargar
         super.setIntegerProperty("loadUrlTimeoutValue", 70000);
         super.loadUrl("file:///android_asset/www/index.html");
+        //Para que se vea la status bar
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 }
 
