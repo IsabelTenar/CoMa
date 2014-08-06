@@ -7,12 +7,16 @@
 <script type="text/javascript" src="js/cordova.js"></script>
 <script type="text/javascript" src="js/libs/jquery-1.7.1/jquery.min.js"></script>
 
+<script type="text/javascript" src="js/libs/jquery-mobile-1.0.1/jquery.mobile-1.4.2.min.js"></script>
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.1/jquery.mobile-1.4.1.min.css" />
+
 <script type="text/javascript">
 	//add listener when device ready
 	document.addEventListener("deviceready", onDeviceReady, false);
 	var db = window.openDatabase("Congress", "1.0", "congress", 0);
 	var resultado;
 	var chcon;
+	var num_dias;
 	
 	
 	//function will be called when device ready
@@ -25,6 +29,9 @@
 		
 		//Llenamos las cajas de información con el congreso por defecto :D
 		db.transaction(populate_void, error_default, success_info);
+		
+		//Creamos el navbar de dias que dura el congreso
+		db.transaction(populate_void3, error_default, success_dias);
 		
 		 //Llenamos la caja de las actividades
 		db.transaction(populate_void3, error_default, success_acti); 
@@ -81,6 +88,12 @@
 	//Populate vacio, cuando no tenemos que hacer nada
 	function populate_void3(t3) {}
 	
+	
+	//---------------------------------------------------------------------
+	// 				RELLENA LA CASILLA DE INFORMACIÓN
+	//---------------------------------------------------------------------
+	
+	
 	//Para generar la información dentro de cada página de la aplicación, con el primer congreso por defecto
 	function success_info() {
 		db.transaction(query_info, error_default);
@@ -103,38 +116,107 @@
 		$('#info').listview();		
 	}
 	
-	function success_acti() {
+	//---------------------------------------------------------------------
+	// 				RELLENA EL NAVBAR DE DIAS
+	//---------------------------------------------------------------------
+	
+	 
+	function success_dias() {
+		db.transaction(query_dias, error_default);
+	}
+	
+	//Obtenemos todo acerca de las actividades del congreso actual
+	function query_dias(t3) {
+		q = "SELECT DISTINCT strftime('%d', Fecha) as Dia FROM Actividades WHERE NombreCon = \'" + chcon + "\';";
+		t3.executeSql(q, [], querysuccess_dias, error_default);
+	}
+	
+	// Rellena las actividades del congreso actual
+	function querysuccess_dias(t3, result3) {
+		 $('#timetable').empty(); 
+		var html = '<div data-role="content"><div data-role="tabs" id="tabs" data-position="fixed"><div data-role="navbar"><ul>';
+		var html_aux = '';
+		
+		delete num_dias;
+		num_dias = new Array ();
+		var i = 0;
+		
+ 		$.each(result3.rows, function(index) {
+			var row = result3.rows.item(index);
+			html = html + '<li><a href="#dia' +row['Dia']		//IDENTIFICADOR DE LA LISTA
+			+'">Dia '
+			+row['Dia']
+			+'</a></li>';
+			
+			html_aux = html_aux + '<div id="dia' +row['Dia']+ '">'+ row['Dia'] +'</div>';
+			
+			num_dias [i] = "dia" + row['Dia'];
+			i++;
+		}); 
+		
+ 		html = html + '</ul></div>';
+ 		html = html + html_aux + '</div></div>';
+ 		
+ 		$('#timetable').append(html).trigger( "create" ); 
+	} 
+	
+	//---------------------------------------------------------------------
+	// 				RELLENA LAS ACTIVIDADES: PONERLAS EN FUNCIÓN DEL DIA!!
+	//---------------------------------------------------------------------
+	
+  	function success_acti() {
 		db.transaction(query_acti, error_default);
 	}
 	
 	//Obtenemos todo acerca de las actividades del congreso actual
 	function query_acti(t3) {
-		q = "SELECT NombreAct, Informacion, Hora_ini, NombreCon  FROM Actividades WHERE NombreCon = \'" + chcon + "\';";
+		q = "SELECT NombreAct, Informacion, strftime('%H', Hora_ini) as Hora,strftime('%M', Hora_ini) as Minuto, NombreCon, strftime('%d', Fecha) as Dia FROM Actividades WHERE NombreCon = \'" + chcon + "\';";
 		t3.executeSql(q, [], querysuccess_acti, error_default);
 	}
 	
 	// Rellena las actividades del congreso actual
 	function querysuccess_acti(t3, result3) {
-		$('#timetable').empty(); 
-		var html = '<div data-role="collapsible-set">' 
-		  
+
+		var j;
+		//Limpiamos lo que hata dentro de esa etiqueta
+ 		for (j = 0; j < num_dias.length ; j++){
+ 			$('#' + num_dias[j]).empty(); 
+ 		}
+		
+		//Guardamos memoria para los html que vamos a generar
+		var html = new Array(num_dias.length);
+		
+		//Les ponemos a todos la cabecera
+ 		for (j = 0; j < num_dias.length ; j++){
+ 			html[j] = '<div data-role="collapsible-set">';
+ 		}
+		 
+		//Rellenar dentro de cada navbar sus correspondientes actividades
  		$.each(result3.rows, function(index) {
 			var row = result3.rows.item(index);
-			html = html + '<div data-role="collapsible" data-collapsed="false">'
-			  + '<h3>'+ row['NombreAct'] 
-			  + '<p class="ui-li-desc">Dia: '
-			  + row['Hora_ini'] + '</p>' + '</h3>'
-			  + '<p>'+ row['Informacion'] +'</p>'
-			  + '</div>' 
+			var aux = "dia" + row['Dia'];
+			
+			for (j = 0; j < num_dias.length ; j++){
+				if (aux == num_dias[j]){
+					html[j] = html[j] + '<div data-role="collapsible" data-collapsed="false">'
+					  + '<h3><font color="blue">'+ row['NombreAct'] 
+					  + '</font>   Inicio: '
+					  + row['Hora'] + ':' + row['Minuto'] + '</h3>'
+					  + '<p>'+ row['Informacion'] +'</p>'
+					  + '</div>';
+				}
+			}
 		}); 
 		  
-		html = html + '</div>';
-		  
-		$('#timetable').append(html).trigger( "create" );
-		
-		$('#timetable').listview();	  
-	}
+ 		for (j = 0; j < num_dias.length ; j++){
+ 			html[j] = html[j] + '</div>';
+ 			$('#' + num_dias[j]).append(html[j]).trigger( "create" );
+ 		}
+	} 
 	
+	//---------------------------------------------------------------------
+	// 				OTROS
+	//---------------------------------------------------------------------
 	
 	//Con esta función objetemos un array con los nombres de todos los congresos dentro de la aplicacion
 	//Se usa para saber cual es el nombre del congreso seleccionado en cada momento
@@ -161,16 +243,14 @@
     			$(n).live('click',function () {
             		chcon = array_retorno[index];
             		db.transaction(populate_void, error_default, success_info);
+            		db.transaction(populate_void3, error_default, success_dias);
+            		//db.transaction(populate_void3, error_default, success_acti); 
             	});
     		});
 		});
             
     });
 </script>
-
-<script type="text/javascript" src="js/libs/jquery-mobile-1.0.1/jquery.mobile-1.4.2.min.js"></script>
-<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.1/jquery.mobile-1.4.1.min.css" />
-
 
 </head>
 <body>
@@ -198,10 +278,6 @@
 			
 			<!-- DENTRO DE TIMETABLE -->
 			<div id="timetable">
-				<!-- <div data-role="collapsible">
-  					<h3>I'm a header</h3>
-  					<p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
-				</div> -->
 			</div>
 			
 			<!-- DENTRO DE NEWS -->
