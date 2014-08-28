@@ -8,22 +8,31 @@
 <script type="text/javascript" src="js/libs/jquery-1.7.1/jquery.min.js"></script>
 
 <script type="text/javascript" src="js/libs/jquery-mobile-1.0.1/jquery.mobile-1.4.2.min.js"></script>
+<script type="stylesheet" src="css/Estilo.css"></script>
 <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.1/jquery.mobile-1.4.1.min.css" />
+
+<script type="text/javascript" src="js/Actividades.js"></script>
+<script type="text/javascript" src="js/Favorito.js"></script>
+<script type="text/javascript" src="js/Informacion.js"></script>
+<script type="text/javascript" src="js/Navbar.js"></script>
+
 
 <script type="text/javascript">
 	//add listener when device ready
 	document.addEventListener("deviceready", onDeviceReady, false);
 	var db = window.openDatabase("Congress", "1.0", "congress", 0);
 	var resultado;
-	var chcon;
-	var num_dias;
+	var chcon; //Congreso actual
+	var chact; //Actividad actual
+	var num_dias; //Dias por congreso
+	var twitter; //Twitter del congreso actual
 	
 	
 	//function will be called when device ready
 	function onDeviceReady() {
 		
 		//Congreso inicial para rellenar las casillas
-		chcon = "Congreso1";
+		//chcon = "Congreso1";
 		//Creamos las tablas Congresos y Actividades y metemos datos de prueba
 		db.transaction(populateCon, error_default, successCB);
 		
@@ -35,22 +44,30 @@
 		
 		 //Llenamos la caja de las actividades
 		db.transaction(populate_void3, error_default, success_acti); 
-		 
 	}
 	
+	
+	//Populate vacio, cuando no tenemos que hacer nada
+	function populate_void(t2) {}
+	//Populate vacio, cuando no tenemos que hacer nada
+	function populate_void3(t3) {}
+	//Populate vacio, cuando no tenemos que hacer nada
+	function populate_void4(t4) {}
+
+
 	//Crea tablas y mete información de prueba dentro de Congresos y Actividades
 	function populateCon(tx) {
-		tx.executeSql('CREATE TABLE IF NOT EXISTS Congresos (Nombre VARCHAR(20) PRIMARY KEY NOT NULL, Fecha_ini DATE, Fecha_ fin DATE, Informacion VARCHAR(40), Ciudad VARCHAR(20))');
-/* 		tx.executeSql('INSERT INTO Congresos VALUES ("Congreso1", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 1", "Granada")');
-		tx.executeSql('INSERT INTO Congresos VALUES ("Congreso2", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 2", "Sevilla")');
-		tx.executeSql('INSERT INTO Congresos VALUES ("Congreso3", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 3", "Cadiz")');
+		tx.executeSql('CREATE TABLE IF NOT EXISTS Congresos (Nombre VARCHAR(20) PRIMARY KEY NOT NULL, Fecha_ini DATE, Fecha_ fin DATE, Informacion VARCHAR(40), Ciudad VARCHAR(20), Twitter VARCHAR(20))');
+		/* tx.executeSql('INSERT INTO Congresos VALUES ("Congreso1", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 1", "Granada", "@tichatuch")');
+		tx.executeSql('INSERT INTO Congresos VALUES ("Congreso2", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 2", "Sevilla", "@fergunet")');
+		tx.executeSql('INSERT INTO Congresos VALUES ("Congreso3", "2015-08-13", "2015-08-17", "Se trata de un congreso de prueba 3", "Cadiz", "@pacastillo")');
 		 */
-		tx.executeSql('CREATE TABLE IF NOT EXISTS Actividades (NombreAct VARCHAR(20) PRIMARY KEY NOT NULL, NombreCon VARCHAR(20) NOT NULL, Hora_ini TIME, Hora_fin TIME, Fecha DATE, Informacion VARCHAR(40))');
-/*  		tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Patata","Congreso1","17:30:00","20:30:00", "2015-08-13", "Meeting sobre Patatas, una fuente de alimentacion")');
-		tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Sandia","Congreso1","17:30:00","20:30:00","2015-08-13", "Meeting sobre Sandias, una fuente de alimentacion")');
-		tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Peras","Congreso1","17:30:00","19:30:00","2015-08-14", "Meeting sobre Peras, una fuente de alimentacion")');
-		tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Tomates","Congreso1","19:30:00","20:30:00","2015-08-15", "Meeting sobre Patatas, una fuente de alimentacion")');
- 		  */
+		tx.executeSql('CREATE TABLE IF NOT EXISTS Actividades (NombreAct VARCHAR(20) PRIMARY KEY NOT NULL, NombreCon VARCHAR(20) NOT NULL, Hora_ini TIME, Hora_fin TIME, Fecha DATE, Informacion VARCHAR(40), Favorito INTEGER)');
+  		/* tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Patata","Congreso1","17:30:00","20:30:00", "2015-08-13", "Meeting sobre Patatas, una fuente de alimentacion",0)');
+		tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Sandia","Congreso1","17:30:00","20:30:00","2015-08-13", "Meeting sobre Sandias, una fuente de alimentacion",0)');
+		tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Peras","Congreso1","17:30:00","19:30:00","2015-08-14", "Meeting sobre Peras, una fuente de alimentacion",0)');
+		tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Tomates","Congreso1","19:30:00","20:30:00","2015-08-15", "Meeting sobre Tomates, una fuente de alimentacion",0)');
+		 */
 	}
 	
 	//Función que devuelve error SQL por defecto
@@ -65,14 +82,16 @@
 	
 	// Realiza la query para saber el nombre y la fecha de inicio de los congresos a seleccionar
 	function queryDB(tx) {
-		tx.executeSql('SELECT Nombre, Fecha_ini FROM Congresos', [], querySuccess, error_default);
+		tx.executeSql('SELECT Nombre, Fecha_ini, Twitter FROM Congresos', [], querySuccess, error_default);
 	}
 	
 	//Genera el html de la lista de congresos entre los que podemos seleccionar
 	function querySuccess(tx, result) {
 		$('#CongressList').empty();
+		var primero = 1;
 		$.each(result.rows, function(index) {
 			var row = result.rows.item(index);
+			if (primero == 1){chcon = row['Nombre']; primero = 0;}
 			$('#CongressList').append(
 					'<li id = "'+row['Nombre']+'"><a href="#"><h3 class="ui-li-heading">'
 							+ row['Nombre']
@@ -82,138 +101,7 @@
 		
 		$('#CongressList').listview();
 	}
-	
-	//Populate vacio, cuando no tenemos que hacer nada
-	function populate_void(t2) {}
-	//Populate vacio, cuando no tenemos que hacer nada
-	function populate_void3(t3) {}
-	
-	
-	//---------------------------------------------------------------------
-	// 				RELLENA LA CASILLA DE INFORMACIÓN
-	//---------------------------------------------------------------------
-	
-	
-	//Para generar la información dentro de cada página de la aplicación, con el primer congreso por defecto
-	function success_info() {
-		db.transaction(query_info, error_default);
-	}
-	
-	function query_info(t2) {
-		q = "SELECT Informacion FROM Congresos WHERE Nombre = \'" + chcon + "\';";
-		t2.executeSql(q, [], querysuccess_info, error_default);
-	}
-	
-	// Rellena el congreso que esta picado.
-	function querysuccess_info(t2, result2) {
-		//Rellena la ventana con la información
-		$('#info').empty();
-		$.each(result2.rows, function(index) {
-			var row = result2.rows.item(index);
-			$('#info').append(
-					'<h1>' + row['Informacion'] + '</h1>');
-		});
-		$('#info').listview();		
-	}
-	
-	//---------------------------------------------------------------------
-	// 				RELLENA EL NAVBAR DE DIAS
-	//---------------------------------------------------------------------
-	
-	 
-	function success_dias() {
-		db.transaction(query_dias, error_default);
-	}
-	
-	//Obtenemos todo acerca de las actividades del congreso actual
-	function query_dias(t3) {
-		q = "SELECT DISTINCT strftime('%d', Fecha) as Dia FROM Actividades WHERE NombreCon = \'" + chcon + "\';";
-		t3.executeSql(q, [], querysuccess_dias, error_default);
-	}
-	
-	// Rellena las actividades del congreso actual
-	function querysuccess_dias(t3, result3) {
-		 $('#timetable').empty(); 
-		var html = '<div data-role="content"><div data-role="tabs" id="tabs" data-position="fixed"><div data-role="navbar"><ul>';
-		var html_aux = '';
-		
-		delete num_dias;
-		num_dias = new Array ();
-		var i = 0;
-		
- 		$.each(result3.rows, function(index) {
-			var row = result3.rows.item(index);
-			html = html + '<li><a href="#dia' +row['Dia']		//IDENTIFICADOR DE LA LISTA
-			+'">Dia '
-			+row['Dia']
-			+'</a></li>';
-			
-			html_aux = html_aux + '<div id="dia' +row['Dia']+ '">'+ row['Dia'] +'</div>';
-			
-			num_dias [i] = "dia" + row['Dia'];
-			i++;
-		}); 
-		
- 		html = html + '</ul></div>';
- 		html = html + html_aux + '</div></div>';
- 		
- 		$('#timetable').append(html).trigger( "create" ); 
-	} 
-	
-	//---------------------------------------------------------------------
-	// 				RELLENA LAS ACTIVIDADES: PONERLAS EN FUNCIÓN DEL DIA!!
-	//---------------------------------------------------------------------
-	
-  	function success_acti() {
-		db.transaction(query_acti, error_default);
-	}
-	
-	//Obtenemos todo acerca de las actividades del congreso actual
-	function query_acti(t3) {
-		q = "SELECT NombreAct, Informacion, strftime('%H', Hora_ini) as Hora,strftime('%M', Hora_ini) as Minuto, NombreCon, strftime('%d', Fecha) as Dia FROM Actividades WHERE NombreCon = \'" + chcon + "\';";
-		t3.executeSql(q, [], querysuccess_acti, error_default);
-	}
-	
-	// Rellena las actividades del congreso actual
-	function querysuccess_acti(t3, result3) {
 
-		var j;
-		//Limpiamos lo que hata dentro de esa etiqueta
- 		for (j = 0; j < num_dias.length ; j++){
- 			$('#' + num_dias[j]).empty(); 
- 		}
-		
-		//Guardamos memoria para los html que vamos a generar
-		var html = new Array(num_dias.length);
-		
-		//Les ponemos a todos la cabecera
- 		for (j = 0; j < num_dias.length ; j++){
- 			html[j] = '<div data-role="collapsible-set">';
- 		}
-		 
-		//Rellenar dentro de cada navbar sus correspondientes actividades
- 		$.each(result3.rows, function(index) {
-			var row = result3.rows.item(index);
-			var aux = "dia" + row['Dia'];
-			
-			for (j = 0; j < num_dias.length ; j++){
-				if (aux == num_dias[j]){
-					html[j] = html[j] + '<div data-role="collapsible" data-collapsed="false">'
-					  + '<h3><font color="blue">'+ row['NombreAct'] 
-					  + '</font>   Inicio: '
-					  + row['Hora'] + ':' + row['Minuto'] + '</h3>'
-					  + '<p>'+ row['Informacion'] +'</p>'
-					  + '</div>';
-				}
-			}
-		}); 
-		  
- 		for (j = 0; j < num_dias.length ; j++){
- 			html[j] = html[j] + '</div>';
- 			$('#' + num_dias[j]).append(html[j]).trigger( "create" );
- 		}
-	} 
-	
 	//---------------------------------------------------------------------
 	// 				OTROS
 	//---------------------------------------------------------------------
@@ -222,7 +110,7 @@
 	//Se usa para saber cual es el nombre del congreso seleccionado en cada momento
 	function p (callback){
 		  db.transaction(function coletandovisitas(tx){
-			  tx.executeSql('SELECT Nombre FROM Congresos', [], function x(tx, results){
+			  tx.executeSql('SELECT Nombre, Twitter FROM Congresos', [], function x(tx, results){
 			    var array_retorno = new Array();
 			    $.each(results.rows, function(index) {
 			    	var row = results.rows.item(index);
@@ -232,7 +120,8 @@
 			  }, function err(){} );            
 			  },function erro(){}, function acerto(){} );
 	}
-	
+	   
+    
     $(document).ready(function(){
     	
     	//Cuando se hace click en un congreso nuevo dentro de "My congress" se 
@@ -244,7 +133,7 @@
             		chcon = array_retorno[index];
             		db.transaction(populate_void, error_default, success_info);
             		db.transaction(populate_void3, error_default, success_dias);
-            		//db.transaction(populate_void3, error_default, success_acti); 
+            		db.transaction(populate_void3, error_default, success_acti);
             	});
     		});
 		});
@@ -282,13 +171,13 @@
 			
 			<!-- DENTRO DE NEWS -->
 			<div id="news">
-			
-				<a class="twitter-timeline" href="https://twitter.com/tichatuch" data-widget-id="482081557960617985">Tweets por @tichatuch</a>
+				<div data-role="content">
+ 					<a class="twitter-timeline" href="https://twitter.com/tichatuch" data-widget-id="482081557960617985">Tweets por @tichatuch</a>
 
-				<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id))
-				{js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}
-				(document,"script","twitter-wjs");</script>
-
+					<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id))
+					{js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}
+					(document,"script","twitter-wjs");</script>
+				</div>
 			</div>
 		</div>
 	</div>
