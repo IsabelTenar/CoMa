@@ -30,7 +30,7 @@ function query_confav(t5) {
 function querysuccess_confav(t5, result5) {
 	$.each(result5.rows, function(index) {
 		var row = result5.rows.item(index);
-		if (row['Favorito'] == 0){
+		if (row['Favorito'] == 0 || row['Favorito'] == null || row['Favorito'] == undefined){
    			db.transaction(populate_void4, error_default, success_fav);
    		}
    		else
@@ -64,6 +64,10 @@ function query_fav(t4) {
  * 
  * **/
 function querysuccess_fav(t4, result4) {
+	var actSinEspa = chact.replace(" ","");
+	var congSinEspa = chcon.replace(" ","");
+	var id = actSinEspa + congSinEspa + 'add';
+	$("#"+id).attr("value","Quitar Favorito").button('refresh');
 	//alert ("Agregamos Favoritos!");
 }
 
@@ -93,7 +97,10 @@ function query_disfav(t) {
  * 
  * **/
 function querysuccess_disfav(t, result) {
-	//alert ("Quitado Favoritos!");
+	var actSinEspa = chact.replace(" ","");
+	var congSinEspa = chcon.replace(" ","");
+	var id = actSinEspa + congSinEspa + 'add';
+	$("#"+id).attr("value","Agregar Favorito").button('refresh');
 }
 
 
