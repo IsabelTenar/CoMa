@@ -60,12 +60,8 @@
 					  +'<div id="button-set">'
                       +'<input type="button"';
 					
-					if (row['Favorito'] == 0|| row['Favorito'] == null || row['Favorito'] == undefined){
-						html[j] = html[j] + 'value = "Agregar a Favoritos"';
-                    }
-					else {
-						html[j] = html[j] +'value = "Agregar a Favoritos"';
-					}
+					html[j] = html[j] + 'value = "Agregar a Favoritos"';
+                    
 					html[j] = html[j] + ' data-mini="true" data-inline="true" data-icon="star"' 
                       + 'data-icon-pos="top" id="'+id+ 'add' + '"'
                       + 'onclick="saveFave(\''+row['NombreAct']+'\',\''+row['NombreCon']+'\')"'

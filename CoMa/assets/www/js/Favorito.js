@@ -14,6 +14,8 @@ function saveFave(actividad, congreso) {
 	   	chcon = congreso;
 	   	db.transaction(populate_void5, error_default, success_confav);
 	   	
+	   	rellena_favoritos ();
+	   	
 	}
 
 /*************************** CONSULTAR FAVORITO *******************************/

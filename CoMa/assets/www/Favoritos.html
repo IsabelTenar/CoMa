@@ -1,3 +1,4 @@
+
 <div id = "favoritos">
 <script type="text/javascript" src="js/cordova.js"></script>
 <script type="text/javascript" src="js/libs/jquery-1.7.1/jquery.min.js"></script>
@@ -6,24 +7,32 @@
 <!-- <script type="stylesheet" src="themes/CoMa.css"></script>
 <script type="stylesheet" src="themes/CoMa.min.css"></script> -->
 <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.1/jquery.mobile-1.4.1.min.css" />
-<div id = "about">
+<body>
+	<!--HEADER!-->
 	<div data-role="header" data-theme="b">
-		<h1>About</h1>
+		<h1>Favoritos</h1>
 	</div>
-	<h3>Cosas acerca de nosotros!!</h3>
+	<!-- BODY -->
 	
+			<div id='listafavoritos'>
+			</div>
+	
+	<!--FOOTER-->
 	<div data-role="footer" data-theme="b" data-position="fixed">
 		<a href="#" data-rel="popup"
 			class="ui-btn ui-shadow ui-btn-inline ui-icon-gear 
                ui-btn-icon-left ui-btn-a"
-			style="float: left" data-icon="arrow-l" onclick = "history.back()" name = "atrasabout">Atras</a>
+			style="float: left" data-icon="arrow-l" onclick = "history.back()" name = "atrasfav">Atras</a>
 	</div>
+</body>
 </div>
-
 <script type="text/javascript">
-$('a[name=atrasabout]').click( function () {
+$('a[name=atrasfav]').click( function () {
 	$( "#bodyprincipal" ).load( "#paginaprincipal", function() {
 	});
 	return false;
 });
 </script>
+
+
+

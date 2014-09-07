@@ -1,0 +1,6 @@
+function EntraFavoritos(){
+	
+}
+function EntraAbout(){
+	
+}

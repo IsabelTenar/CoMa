@@ -8,15 +8,14 @@
 <script type="text/javascript" src="js/libs/jquery-1.7.1/jquery.min.js"></script>
 
 <script type="text/javascript" src="js/libs/jquery-mobile-1.0.1/jquery.mobile-1.4.2.min.js"></script>
-<!-- <script type="stylesheet" src="themes/CoMa.css"></script>
-<script type="stylesheet" src="themes/CoMa.min.css"></script> -->
+<script type="stylesheet" src="themes/CoMa.css"></script>
 <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.1/jquery.mobile-1.4.1.min.css" />
 
 <script type="text/javascript" src="js/Actividades.js"></script>
 <script type="text/javascript" src="js/Favorito.js"></script>
 <script type="text/javascript" src="js/Informacion.js"></script>
 <script type="text/javascript" src="js/Navbar.js"></script>
-
+<script type="text/javascript" src="js/ListFav.js"></script>
 
 <script type="text/javascript">
 	//add listener when device ready
@@ -31,7 +30,7 @@
 	
 	//function will be called when device ready
 	function onDeviceReady() {
-		
+		$( "#bodyprincipal" ).load( "PaginaPrincipal.html", function() {});
 		//Congreso inicial para rellenar las casillas
 		//chcon = "Congreso1";
 		//Creamos las tablas Congresos y Actividades y metemos datos de prueba
@@ -44,9 +43,10 @@
 		db.transaction(populate_void3, error_default, success_dias);
 		
 		 //Llenamos la caja de las actividades
-		db.transaction(populate_void3, error_default, success_acti); 
+		db.transaction(populate_void3, error_default, success_acti);
+		 
+		rellena_favoritos ();
 	}
-	
 	
 	//Populate vacio, cuando no tenemos que hacer nada
 	function populate_void(t2) {}
@@ -68,7 +68,7 @@
 		tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Sandia","Congreso1","17:30:00","20:30:00","2015-08-13", "Meeting sobre Sandias, una fuente de alimentacion",0)');
 		tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Peras","Congreso1","17:30:00","19:30:00","2015-08-14", "Meeting sobre Peras, una fuente de alimentacion",0)');
 		tx.executeSql('INSERT INTO Actividades VALUES ("Meeting Tomates","Congreso1","19:30:00","20:30:00","2015-08-15", "Meeting sobre Tomates, una fuente de alimentacion",0)');
-		 */
+	 */
 	}
 	
 	//Función que devuelve error SQL por defecto
@@ -134,7 +134,7 @@
             		chcon = array_retorno[index];
             		db.transaction(populate_void, error_default, success_info);
             		db.transaction(populate_void3, error_default, success_dias);
-            		db.transaction(populate_void3, error_default, success_acti);
+            		db.transaction(populate_void3, error_default, success_acti);            		
             	});
     		});
 		});
@@ -143,10 +143,10 @@
 </script>
 
 </head>
-<body>
+<body id = "bodyprincipal">
 
 	<!--HEADER!-->
-
+<div id = "paginaprincipal">
 	<div data-role="header" data-theme="b">
 		<h1>CoMa!!</h1>
 	</div>
@@ -188,8 +188,8 @@
 		data-position-fixed="true" data-theme="b">
 		<div data-role="content">
 			<ul data-role="listview">
-				<li><a href="#">Favoritos</a></li>
-				<li><a href="About.html">About</a></li>
+				<li><a href="#" name = "favoritos">Favoritos</a></li>
+				<li><a href="#" name = "about">About</a></li>
 
 			</ul>
 		</div>
@@ -217,7 +217,27 @@
 			style="float: left">Options</a>
 
 	</div>
-
-
+</div>
+	
 </body>
+
+<script type="text/javascript">
+$('a[name=favoritos]').click( function () {
+	$( "#bodyprincipal" ).load( "Favoritos.html", function() {
+		rellena_favoritos();
+	});
+	return false;
+});
+</script>
+
+<script type="text/javascript">
+$('a[name=about]').click( function () {
+	$( "#bodyprincipal" ).load( "About.html", function() {
+	});
+	return false;
+});
+</script>
+
+
 </html>
+
